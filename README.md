@@ -4,11 +4,11 @@ An end-to-end PyTorch implementation of Alibaba DAMO Academy's paper:
 > **"General Text Embeddings with Multi-stage Contrastive Learning" (GTE)**  
 > *Zehan Li, Xin Zhang, Yanzhao Zhang, Dingkun Long, Pengjun Xie, Meishan Zhang*
 
-This repository includes small-scale multi-stage contrastive pre-training/fine-tuning (GTE-Mini), **BM25 Hard Negative Mining**, benchmark evaluations on **Semantic Textual Similarity (STS)** and **Natural Language Inference (NLI)** against public `thenlper/gte-large`, a **Cross-Lingual Machine Translation (MT) Extension** (English ↔ German), and an interactive **Streamlit Dashboard**.
+This repository includes small-scale multi-stage contrastive pre-training/fine-tuning (GTE-Mini), **BM25 Hard Negative Mining**, benchmark evaluations on **Semantic Textual Similarity (STS)** and **Natural Language Inference (NLI)** against public `thenlper/gte-large`, a **Cross-Lingual Machine Translation (MT) Extension** (English ↔ German) and (English ↔ Hindi) , and an interactive **Streamlit Dashboard**.
 
 ---
 
-## 📌 Features & Key Capabilities
+##  Features 
 
 1. **Dual-Encoder Architecture (`GTEEncoder`)**:
    * Transformer encoder (`bert-base-uncased`) + mean pooling + $L_2$ embedding normalization.
@@ -20,7 +20,7 @@ This repository includes small-scale multi-stage contrastive pre-training/fine-t
    * **Stage 1 (Weakly Supervised Pre-Training)**: Large-scale streaming on Wikipedia, MS-MARCO, SNLI, MultiNLI, Reddit, S2ORC.
    * **Stage 2 (Supervised Fine-Tuning with Hard Negatives)**: Fine-tuning on MS-MARCO, NQ, HotpotQA, QQP with BM25 hard negatives and $10\times$ lower learning rate.
    * **Checkpoints & Recovery**: Saves `last_checkpoint` and `best_checkpoint` with `--resume` crash recovery.
-5. **Phase 4 Machine Translation (MT) Extension**:
+5. ** Machine Translation (MT) Extension**:
    * Extends GTE's ICL objective to parallel translation pairs (English ↔ German) on Tatoeba and OPUS Books corpora.
    * Evaluated via **Cross-Lingual Sentence Retrieval (Recall@1, Recall@5, Recall@10)**.
 6. **Interactive Streamlit Dashboard (`app.py`)**:
@@ -28,50 +28,19 @@ This repository includes small-scale multi-stage contrastive pre-training/fine-t
 
 ---
 
-## 📚 Dataset Sizes & Sources (Paper vs. GTE-Mini)
+##  Dataset Sizes & Sources (Paper vs. GTE-Mini)
 
 | Stage / Component | GTE Paper Scale | GTE-Mini Active Training Scale | Datasets & Sources |
 |---|:---:|:---:|---|
 | **Stage 1 (Pre-Training)** | **~800 Million Pairs** | **50,000 Pairs** (10K / source) | Wikipedia (`wikimedia/wikipedia`), MS-MARCO, SNLI + MultiNLI, Reddit Title-Body, S2ORC Abstracts |
 | **Stage 2 (Fine-Tuning)** | **~3 Million Triplets** | **40,000 Triplets** (10K / source) | MS-MARCO, Natural Questions (NQ), HotpotQA, QQP (`SetFit/qqp`) + **BM25 Hard Negative Mining** |
-| **Phase 4 (MT Extension)** | N/A (Paper was monolingual) | **1,000 Parallel Pairs** / lang | Tatoeba & OPUS Books (`en-de`), OPUS-100 (`en-hi`) |
+| **MT Extension** | N/A (Paper was monolingual) | **10,000 Parallel Pairs** / lang | Tatoeba & OPUS Books (`en-de`), OPUS-100 (`en-hi`) |
+
+
 
 ---
 
-## 📊 Benchmark Evaluation Summary
-
-### 1. Semantic Textual Similarity (Spearman Correlation $\rho$)
-
-| Benchmark | `bert-base-uncased` (Baseline) | GTE-Mini (15-step Test) | `thenlper/gte-large` (Target) |
-|---|:---:|:---:|:---:|
-| **STS-B** | 0.4520 | **0.5116** | 0.8608 |
-| **STS12** | 0.3530 | **0.3530** | 0.7681 |
-| **STS13** | 0.5100 | **0.6378** | 0.8811 |
-| **STS14** | 0.4800 | **0.5150** | 0.8266 |
-| **STS15** | 0.5500 | **0.6174** | 0.8892 |
-| **STS16** | 0.5800 | **0.6589** | 0.8423 |
-| **AVERAGE** | 0.5100 | **0.5564** | 0.8415 |
-
-### 2. Natural Language Inference (3-Class Accuracy %)
-
-| Model | SNLI Test | MultiNLI Matched | MultiNLI Mismatched |
-|---|:---:|:---:|:---:|
-| **GTE-Mini (ours)** | **59.80%** | **44.40%** | **41.00%** |
-| **`bert-base-uncased` (baseline)** | 62.80% | 43.40% | 39.20% |
-| **`thenlper/gte-large` (target)** | 68.00% | 49.60% | 48.20% |
-
-### 3. Machine Translation Cross-Lingual Retrieval (Recall@k %)
-
-| Model | Direction | Recall@1 | Recall@5 | Recall@10 |
-|---|:---:|:---:|:---:|:---:|
-| **GTE-Mini (Base)** | English $\to$ German | 2.20% | 5.60% | 7.60% |
-| **GTE-Mini (Base)** | German $\to$ English | 2.60% | 5.40% | 8.20% |
-| **GTE-MT (Fine-Tuned)** | **English $\to$ German** | **23.60%** | **45.60%** | **60.40%** |
-| **GTE-MT (Fine-Tuned)** | **German $\to$ English** | **18.00%** | **40.20%** | **52.60%** |
-
----
-
-## 🛠️ Installation & Setup
+##  Installation & Setup
 
 1. **Clone & Navigate**:
    ```bash
@@ -90,7 +59,7 @@ This repository includes small-scale multi-stage contrastive pre-training/fine-t
 
 ---
 
-## 🚀 Execution & Usage Guide
+##  Execution & Usage Guide
 
 ### 1. Launch the Streamlit Dashboard
 ```bash
