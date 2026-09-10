@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Logs
+*.log
+logs/
+
+# Model Checkpoints & Large Binary Weights
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# OS & Editor files
+.DS_Store
+.vscode/
+.idea/

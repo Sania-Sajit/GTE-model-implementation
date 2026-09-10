@@ -1,0 +1,7 @@
+{
+  "GTE-Mini (ours)": {
+    "SNLI Test": 57.53333333333334,
+    "MultiNLI Matched": 41.8,
+    "MultiNLI Mismatched": 41.733333333333334
+  }
+}
