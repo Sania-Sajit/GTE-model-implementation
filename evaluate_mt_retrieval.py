@@ -33,18 +33,57 @@ def get_device(device_arg: str = None) -> torch.device:
 
 
 def load_mt_model(model_dir: str, device: torch.device):
-    """Load model weights."""
-    weights_path = os.path.join(model_dir, "pytorch_model.bin")
-    if not os.path.exists(weights_path):
-        print(f"ERROR: Model weights not found at '{weights_path}'")
+    """Load model weights dynamically."""
+    if not os.path.exists(model_dir):
+        print(f"ERROR: Model directory not found at '{model_dir}'")
         sys.exit(1)
 
-    model = GTEEncoder("bert-base-uncased")
-    model.load_state_dict(torch.load(weights_path, map_location=device, weights_only=True))
+    config_path = os.path.join(model_dir, "config.json")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path) as f:
+                cfg = json.load(f)
+            if "_name_or_path" in cfg:
+                model = GTEEncoder(model_dir)
+                model.to(device)
+                model.eval()
+                return model
+        except Exception:
+            pass
+
+    weights_path = os.path.join(model_dir, "pytorch_model.bin")
+    if not os.path.exists(weights_path):
+        weights_path = os.path.join(model_dir, "model.safetensors")
+
+    # Detect vocabulary size from state dict to choose correct backbone
+    if weights_path.endswith(".safetensors"):
+        from safetensors.torch import load_file
+        state_dict = load_file(weights_path)
+    else:
+        state_dict = torch.load(weights_path, map_location=device, weights_only=True)
+
+    vocab_size = 30522
+    for k, v in state_dict.items():
+        if "word_embeddings.weight" in k:
+            vocab_size = v.shape[0]
+            break
+
+    base_arch = "bert-base-multilingual-uncased" if vocab_size > 50000 else "bert-base-uncased"
+    model = GTEEncoder(base_arch)
+    model.load_state_dict(state_dict)
     model.to(device)
     model.eval()
 
     return model
+
+
+
+
+
+
+
+
+
 
 
 
@@ -111,7 +150,7 @@ def main():
     args = parser.parse_args()
 
     if args.mt_model is None:
-        args.mt_model = "gte_mt_hi_model" if args.lang_pair == "en-hi" else "gte_mt_model"
+        args.mt_model = "gte_mt_hi_model" if args.lang_pair == "en-hi" else ("gte_mt_de_model" if os.path.exists("gte_mt_de_model") else "gte_mt_model")
 
     lang_tgt = "Hi" if args.lang_pair == "en-hi" else "De"
     device = get_device(args.device)
@@ -125,8 +164,9 @@ def main():
     print(f"  Eval Samples : {args.eval_samples}")
     print("=" * 65 + "\n")
 
-    # Load Parallel Sentence Pairs (Held-out Test Split)
-    pairs = load_tatoeba_pairs(max_samples=args.eval_samples, lang_pair=args.lang_pair, split="test")
+    # Load Parallel Sentence Pairs (Held-out Test Split from Tatoeba)
+    ds_name = "tatoeba"
+    pairs = load_tatoeba_pairs(max_samples=args.eval_samples, lang_pair=args.lang_pair, split="test", dataset_name=ds_name)
     en_texts = [p.src_text for p in pairs]
     tgt_texts = [p.tgt_text for p in pairs]
 
